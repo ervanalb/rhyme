@@ -6,6 +6,7 @@ from pygame.locals import *
 
 import blob
 import colorsys
+from PIL import Image
 
 class Camera:
 	def __init__(self,size=(640,480)):
@@ -51,10 +52,23 @@ class Camera:
 	def process(self):
 		p=self.get_frame()
 		hsv=blob.convert(p,lambda x:colorsys.rgb_to_hsv(*x))
-		blobs=blob.find_all(hsv,lambda x:x[2]>0.8)
-		p=blob.color(p,blobs)
+		def thresh((h,s,v)):
+			return abs(h-194./360.) < 30./360. and s > 10./100. and s < 80./100. and v > 2./100.
+
+		blobs=blob.find_all(hsv,thresh)
+		for b in blobs:
+			b.draw(p)
+			sc=blob.score(b,self.letters[0])
+			if sc>0.8:
+				self.letters[0].draw(p,b.center)
 		self.show_frame(p)
 
 if __name__=='__main__':
 	c=Camera()
+	im=Image.open('letter_imgs/test.png')
+	w,h=im.size
+	ratio=4
+	im=im.resize((w*ratio,h*ratio))
+	c.letters=[blob.Letter(im,'test')]
 	c.run()
+
