@@ -110,6 +110,9 @@ def score(blob,letter):
 	else: # letter bigger than blob
 		b_a=numpy.pad(b_a,((0,0),(int(math.floor(diff_y/2)),int(math.ceil(diff_y/2)))),'constant')
 
-	return float(sum(sum(l_a*b_a))) / max(sum(sum(l_a)),sum(sum(b_a)))
+	inv_l_a=numpy.ones(l_a.shape)-l_a
+	inv_b_a=numpy.ones(b_a.shape)-b_a
+
+	return (float(sum(sum(l_a*b_a)))-0.2*float(sum(sum(inv_l_a*b_a)))-0.7*float(sum(sum(l_a*inv_b_a)))) / max(sum(sum(l_a)),sum(sum(b_a)))-0.25
 
 
